@@ -24,18 +24,17 @@
         v-for="(item, index) in items"
         :key="item.id"
         class="waterfall-item"
+        :data-id="item.id"
         :style="{
           width: `${itemWidth}px`,
-          height: `${item.height}px`,
           transform: `translate3d(${item.left}px, ${item.top}px, 0)`,
         }"
       >
+        <div class="item-cover">
+          <img :src="item.coverImage" class="cover-image" @load="handleImageLoad(item.id)" />
+        </div>
         <div
-          class="item-cover"
-          :style="{ backgroundImage: `url(${item.coverImage})` }"
-        ></div>
-        <div
-          class="flex flex-col justify-start items-start box-border bg-white p-3 h-[40%]"
+          class="flex flex-col justify-start items-start box-border bg-white p-3"
         >
           <div class="mb-3 text-xs">{{ item.title }}</div>
           <div class="text-xs bg-gray-100 px-1 rounded-sm mb-3">
@@ -163,6 +162,8 @@ const fetchData = async (isRefresh = false) => {
     // 刷新时，重置列高度并替换所有数据
     columnHeights[0] = 0;
     columnHeights[1] = 0;
+    // 清空已加载图片集合
+    loadedImages.clear();
     items.value = newItems;
     isRefreshing.value = false;
     // 平滑回弹到顶部
@@ -177,10 +178,19 @@ const fetchData = async (isRefresh = false) => {
     ];
     isLoading.value = false;
   }
-  // 计算位置
-  nextTick(() => {
-    calculateLayout();
-  });
+  // 计算初始位置
+  calculateLayout();
+  
+  // 等待图片加载完成后会自动触发recalculateLayout
+};
+
+// 跟踪已加载图片的集合
+const loadedImages = reactive(new Set());
+
+// 处理图片加载完成事件
+const handleImageLoad = (itemId) => {
+  loadedImages.add(itemId);
+  recalculateLayout();
 };
 
 // 计算瀑布流布局
@@ -191,15 +201,17 @@ const calculateLayout = () => {
   if (items.value.every((item) => item.isNew)) {
     columnHeights[0] = 0;
     columnHeights[1] = 0;
+    // 清空已加载图片集合
+    loadedImages.clear();
   }
 
+  // 首先设置初始位置，以便元素能够渲染到DOM中
   items.value.forEach((item) => {
-    // 只计算新元素的位置，保留旧元素的位置
     if (!item.isNew) return;
-
+    
     // 找出高度较小的列
     const minHeightIndex = columnHeights[0] <= columnHeights[1] ? 0 : 1;
-
+    
     // 计算位置，考虑容器内边距
     const left =
       containerPadding.value +
@@ -207,18 +219,61 @@ const calculateLayout = () => {
     const top =
       columnHeights[minHeightIndex] +
       (columnHeights[minHeightIndex] > 0 ? gapSize.value : 0);
-
+    
     // 更新元素位置
     item.left = left;
     item.top = top;
-
-    // 更新列高度
-    columnHeights[minHeightIndex] = top + item.height;
-
-    // 移除新元素标记
-    item.isNew = false;
   });
+};
 
+// 重新计算布局
+const recalculateLayout = () => {
+  nextTick(() => {
+    const waterfall = document.querySelector('.waterfall-content');
+    if (!waterfall) return;
+    
+    // 重置列高度
+    columnHeights[0] = 0;
+    columnHeights[1] = 0;
+    
+    // 重新计算所有元素的位置
+    items.value.forEach((item, index) => {
+      // 找出高度较小的列
+      const minHeightIndex = columnHeights[0] <= columnHeights[1] ? 0 : 1;
+      
+      // 计算位置，考虑容器内边距
+      const left =
+        containerPadding.value +
+        minHeightIndex * (itemWidth.value + gapSize.value);
+      const top =
+        columnHeights[minHeightIndex] +
+        (columnHeights[minHeightIndex] > 0 ? gapSize.value : 0);
+      
+      // 更新元素位置
+      item.left = left;
+      item.top = top;
+      
+      // 查找当前项目的DOM元素
+      const itemElement = waterfall.querySelector(`[data-id="${item.id}"]`);
+      if (itemElement) {
+        // 获取元素的实际高度
+        const actualHeight = itemElement.offsetHeight;
+        
+        // 更新列高度
+        columnHeights[minHeightIndex] = top + actualHeight + gapSize.value;
+      }
+      
+      // 移除新元素标记
+      item.isNew = false;
+    });
+    
+    // 更新内容区域高度
+    updateContentHeight();
+  });
+};
+
+// 更新内容区域高度
+const updateContentHeight = () => {
   // 更新内容区域高度，考虑底部内边距
   const contentHeight =
     Math.max(columnHeights[0], columnHeights[1]) + containerPadding.value;
@@ -382,16 +437,21 @@ onUnmounted(() => {
   border-radius: 8px;
   overflow: hidden;
   transition: transform 0.3s ease, left 0.3s ease, top 0.3s ease,
-    width 0.3s ease, height 0.3s ease;
+    width 0.3s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background-color: white;
 }
 
 .item-cover {
   width: 100%;
-  height: 60%;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  overflow: hidden;
+}
+
+.cover-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
 }
 
 .item-content {

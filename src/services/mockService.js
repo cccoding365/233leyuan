@@ -50,11 +50,10 @@ const generateRandomTitle = () => {
   return `${prefix}${topic}${suffix}`;
 };
 
-// 生成随机高度 (保持与原代码的高度计算逻辑一致)
-const generateRandomHeight = (containerWidth) => {
-  const baseHeight = getRandomInt(100, 250); // 100-250px的基础随机高度
-  const ratio = Math.max(containerWidth / 375, 0.8);
-  return Math.floor(baseHeight * ratio);
+// 不再生成随机高度，改为固定的初始高度，实际高度将由内容自动撑开
+const generateInitialHeight = (containerWidth) => {
+  // 返回一个初始高度，实际高度将由内容自动撑开
+  return 0; // 返回0，让元素高度完全由内容决定
 };
 
 // 生成随机颜色 (保持与原代码的颜色生成逻辑一致)
@@ -88,7 +87,7 @@ export const getMockData = (count = 10, startIndex = 0, containerWidth = 375) =>
       authorAvatar: author.avatar,
       likes: getRandomInt(0, 999),
       coverImage: getRandomElement(coverImages),
-      height: generateRandomHeight(containerWidth),
+      height: generateInitialHeight(containerWidth),
       color: generateRandomColor(),
       left: 0,
       top: 0,
@@ -115,7 +114,7 @@ export const refreshMockData = (count = 10, containerWidth = 375) => {
       authorAvatar: author.avatar,
       likes: getRandomInt(0, 999),
       coverImage: getRandomElement(coverImages),
-      height: generateRandomHeight(containerWidth),
+      height: generateInitialHeight(containerWidth),
       color: generateRandomColor(),
       left: 0,
       top: 0,
