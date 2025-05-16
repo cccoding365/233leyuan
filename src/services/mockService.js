@@ -13,14 +13,14 @@ import coverImg9 from '../assets/images/covers/cover9.jpg';
 import coverImg10 from '../assets/images/covers/cover10.jpg';
 import coverImg11 from '../assets/images/covers/cover11.jpg';
 import coverImg12 from '../assets/images/covers/cover12.jpg';
-// import coverImg13 from '../assets/images/covers/cover13.jpg';
+import coverImg13 from '../assets/images/covers/cover13.jpg';
 import coverImg14 from '../assets/images/covers/cover14.jpg';
 import coverImg15 from '../assets/images/covers/cover15.jpg';
 import coverImg16 from '../assets/images/covers/cover16.jpg';
-// import coverImg17 from '../assets/images/covers/cover17.jpg';
+import coverImg17 from '../assets/images/covers/cover17.jpg';
 import coverImg18 from '../assets/images/covers/cover18.jpg';
 import coverImg19 from '../assets/images/covers/cover19.jpg';
-// import coverImg20 from '../assets/images/covers/cover20.jpg';
+import coverImg20 from '../assets/images/covers/cover20.jpg';
 
 import avatarImg1 from '../assets/images/avatars/avatar1.jpg';
 import avatarImg2 from '../assets/images/avatars/avatar2.jpg';
@@ -84,14 +84,14 @@ const coverImages = [
   coverImg10,
   coverImg11,
   coverImg12,
-//   coverImg13,
+  coverImg13,
   coverImg14,
   coverImg15,
   coverImg16,
-//   coverImg17,
+  coverImg17,
   coverImg18,
   coverImg19,
-//   coverImg20,
+  coverImg20,
 ];
 
 // 随机标题前缀
