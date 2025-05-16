@@ -1,29 +1,97 @@
 // 模拟数据服务
 
+// 导入本地图片资源
+import coverImg1 from '../assets/images/covers/cover1.jpg';
+import coverImg2 from '../assets/images/covers/cover2.jpg';
+import coverImg3 from '../assets/images/covers/cover3.jpg';
+import coverImg4 from '../assets/images/covers/cover4.jpg';
+import coverImg5 from '../assets/images/covers/cover5.jpg';
+import coverImg6 from '../assets/images/covers/cover6.jpg';
+import coverImg7 from '../assets/images/covers/cover7.jpg';
+import coverImg8 from '../assets/images/covers/cover8.jpg';
+import coverImg9 from '../assets/images/covers/cover9.jpg';
+import coverImg10 from '../assets/images/covers/cover10.jpg';
+import coverImg11 from '../assets/images/covers/cover11.jpg';
+import coverImg12 from '../assets/images/covers/cover12.jpg';
+// import coverImg13 from '../assets/images/covers/cover13.jpg';
+import coverImg14 from '../assets/images/covers/cover14.jpg';
+import coverImg15 from '../assets/images/covers/cover15.jpg';
+import coverImg16 from '../assets/images/covers/cover16.jpg';
+import coverImg17 from '../assets/images/covers/cover17.jpg';
+import coverImg18 from '../assets/images/covers/cover18.jpg';
+import coverImg19 from '../assets/images/covers/cover19.jpg';
+// import coverImg20 from '../assets/images/covers/cover20.jpg';
+
+import avatarImg1 from '../assets/images/avatars/avatar1.jpg';
+import avatarImg2 from '../assets/images/avatars/avatar2.jpg';
+import avatarImg3 from '../assets/images/avatars/avatar3.jpg';
+import avatarImg4 from '../assets/images/avatars/avatar4.jpg';
+import avatarImg5 from '../assets/images/avatars/avatar5.jpg';
+import avatarImg6 from '../assets/images/avatars/avatar6.jpg';
+import avatarImg7 from '../assets/images/avatars/avatar7.jpg';
+import avatarImg8 from '../assets/images/avatars/avatar8.jpg';
+import avatarImg9 from '../assets/images/avatars/avatar9.jpg';
+import avatarImg10 from '../assets/images/avatars/avatar10.jpg';
+import avatarImg11 from '../assets/images/avatars/avatar11.jpg';
+import avatarImg12 from '../assets/images/avatars/avatar12.jpg';
+import avatarImg13 from '../assets/images/avatars/avatar13.jpg';
+import avatarImg14 from '../assets/images/avatars/avatar14.jpg';
+import avatarImg15 from '../assets/images/avatars/avatar15.jpg';
+import avatarImg16 from '../assets/images/avatars/avatar16.jpg';
+import avatarImg17 from '../assets/images/avatars/avatar17.jpg';
+import avatarImg18 from '../assets/images/avatars/avatar18.jpg';
+import avatarImg19 from '../assets/images/avatars/avatar19.jpg';
+import avatarImg20 from '../assets/images/avatars/avatar20.jpg';
+
 // 随机话题列表
 const topics = ['科技', '美食', '旅行', '时尚', '健康', '教育', '娱乐', '体育', '艺术', '宠物'];
 
-// 随机作者列表
+// 本地作者列表
 const authors = [
-  { name: '张三', avatar: 'https://randomuser.me/api/portraits/men/1.jpg' },
-  { name: '李四', avatar: 'https://randomuser.me/api/portraits/women/2.jpg' },
-  { name: '王五', avatar: 'https://randomuser.me/api/portraits/men/3.jpg' },
-  { name: '赵六', avatar: 'https://randomuser.me/api/portraits/women/4.jpg' },
-  { name: '钱七', avatar: 'https://randomuser.me/api/portraits/men/5.jpg' },
+  { name: '张三', avatar: avatarImg1 },
+  { name: '李四', avatar: avatarImg2 },
+  { name: '王五', avatar: avatarImg3 },
+  { name: '赵六', avatar: avatarImg4 },
+  { name: '钱七', avatar: avatarImg5 },
+  { name: '孙八', avatar: avatarImg6 },
+  { name: '周九', avatar: avatarImg7 },
+  { name: '吴十', avatar: avatarImg8 },
+  { name: '郑十一', avatar: avatarImg9 },
+  { name: '王十二', avatar: avatarImg10 },
+  { name: '李十三', avatar: avatarImg11 },
+  { name: '赵十四', avatar: avatarImg12 },
+  { name: '钱十五', avatar: avatarImg13 },
+  { name: '孙十六', avatar: avatarImg14 },
+  { name: '周十七', avatar: avatarImg15 },
+  { name: '吴十八', avatar: avatarImg16 },
+  { name: '郑十九', avatar: avatarImg17 },
+  { name: '王二十', avatar: avatarImg18 },
+  { name: '张二一', avatar: avatarImg19 },
+  { name: '李二二', avatar: avatarImg20 },
 ];
 
-// 随机封面图列表
+// 本地封面图列表
 const coverImages = [
-  'https://picsum.photos/400/300?random=1',
-  'https://picsum.photos/400/400?random=2',
-  'https://picsum.photos/400/500?random=3',
-  'https://picsum.photos/400/600?random=4',
-  'https://picsum.photos/400/350?random=5',
-  'https://picsum.photos/400/450?random=6',
-  'https://picsum.photos/400/550?random=7',
-  'https://picsum.photos/400/320?random=8',
-  'https://picsum.photos/400/420?random=9',
-  'https://picsum.photos/400/520?random=10',
+  coverImg1,
+  coverImg2,
+  coverImg3,
+  coverImg4,
+  coverImg5,
+  coverImg6,
+  coverImg7,
+  coverImg8,
+  coverImg9,
+  coverImg10,
+  coverImg11,
+  coverImg12,
+//   coverImg13,
+  coverImg14,
+  coverImg15,
+  coverImg16,
+  coverImg17,
+  coverImg18,
+  coverImg19,
+//   coverImg20,
 ];
 
 // 随机标题前缀
