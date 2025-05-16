@@ -28,6 +28,7 @@
         :style="{
           width: `${itemWidth}px`,
           transform: `translate3d(${item.left}px, ${item.top}px, 0)`,
+          opacity: item.opacity !== undefined ? item.opacity : 1,
         }"
       >
         <div class="item-cover">
@@ -146,6 +147,7 @@ import { getMockData, refreshMockData } from "./services/mockService";
 
 const fetchData = async (isRefresh = false) => {
   if (isRefresh) {
+    items.value = [];
     isRefreshing.value = true;
   } else {
     isLoading.value = true;
@@ -176,16 +178,34 @@ const fetchData = async (isRefresh = false) => {
     }, 300);
   } else {
     // 加载更多时，追加数据
+    // 为新元素添加标记，并设置初始透明度为0
+    const preparedNewItems = newItems.map((item) => ({
+      ...item,
+      isNew: true,
+      opacity: 1, // 初始不可见
+    }));
+
     items.value = [
       ...items.value.map((item) => ({ ...item, isNew: false })),
-      ...newItems,
+      ...preparedNewItems,
     ];
-	console.log(items.value)
+
+    // 延迟一帧后显示新元素，确保它们已经被定位在底部
+    nextTick(() => {
+      setTimeout(() => {
+        // 使新元素逐渐显示
+        items.value.forEach((item) => {
+          if (item.isNew) {
+            item.opacity = 1;
+          }
+        });
+      }, 50);
+    });
+
     isLoading.value = false;
   }
   // 计算初始位置
   calculateLayout();
-
   // 等待图片加载完成后会自动触发recalculateLayout
 };
 
@@ -203,16 +223,26 @@ const calculateLayout = () => {
   if (containerWidth.value <= 0) return;
 
   // 如果是刷新操作或窗口大小变化，重置列高度
-  if (items.value.some((item) => item.isNew)) {
+  if (
+    items.value.some((item) => item.isNew) &&
+    items.value.every((item) => item.isNew)
+  ) {
+    // 全部是新元素时（刷新操作），重置列高度
     columnHeights[0] = 0;
     columnHeights[1] = 0;
     // 清空已加载图片集合
     loadedImages.clear();
   }
 
+  // 获取当前内容区域的高度估计值，用于新元素的初始定位
+  const currentMaxHeight = Math.max(columnHeights[0], columnHeights[1]);
+
   // 设置所有元素的初始位置，确保在窗口大小变化时所有元素都能正确定位
   items.value.forEach((item) => {
-    // 在窗口大小变化时，处理所有元素，而不仅仅是新元素
+    // 如果不是新元素且已经有位置，则跳过
+    if (!item.isNew && item.left !== undefined && item.top !== undefined) {
+      return;
+    }
 
     // 找出高度较小的列
     const minHeightIndex = columnHeights[0] <= columnHeights[1] ? 0 : 1;
@@ -221,9 +251,12 @@ const calculateLayout = () => {
     const left =
       containerPadding.value +
       minHeightIndex * (itemWidth.value + gapSize.value);
-    const top =
-      columnHeights[minHeightIndex] +
-      (columnHeights[minHeightIndex] > 0 ? gapSize.value : 0);
+
+    // 新元素直接定位在底部，避免从顶部闪现
+    const top = item.isNew
+      ? currentMaxHeight + (currentMaxHeight > 0 ? gapSize.value : 0)
+      : columnHeights[minHeightIndex] +
+        (columnHeights[minHeightIndex] > 0 ? gapSize.value : 0);
 
     // 更新元素位置
     item.left = left;
@@ -319,7 +352,7 @@ const handleScroll = () => {
   const documentHeight = document.documentElement.scrollHeight;
 
   // 当滚动到底部附近时加载更多
-  if (documentHeight - scrollTop - windowHeight < 300) {
+  if (documentHeight - scrollTop - windowHeight < 500) {
     fetchData();
   }
 };
@@ -389,6 +422,16 @@ const handleResize = throttle(() => {
 }, 200);
 
 // 生命周期钩子
+// 监听容器宽度变化，确保响应式布局正确更新
+watch(containerWidth, (newWidth, oldWidth) => {
+  if (newWidth > 0 && newWidth !== oldWidth) {
+    // 在下一个tick中重新计算布局
+    nextTick(() => {
+      recalculateLayout();
+    });
+  }
+});
+
 onMounted(() => {
   // 初始化容器宽度
   if (container.value) {
@@ -463,17 +506,20 @@ onUnmounted(() => {
   position: relative;
   width: 100%;
   transition: transform 0.3s ease, height 0.3s ease;
+  min-height: 100vh; /* 确保内容区域至少有视口高度 */
+  will-change: transform, height; /* 优化性能 */
 }
 
 .waterfall-item {
   position: absolute;
   border-radius: 8px;
   overflow: hidden;
-  transition: transform 0.3s ease, left 0.3s ease, top 0.3s ease,
-    width 0.3s ease, height 0.3s ease;
+  transition: transform 0.4s ease-out, left 0.4s ease-out, top 0.4s ease-out,
+    width 0.4s ease-out, height 0.4s ease-out, opacity 0.3s ease-in-out;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   background-color: white;
-  will-change: transform, left, top, width;
+  will-change: transform, left, top, width, opacity;
+  opacity: 1;
 }
 
 .item-cover {
