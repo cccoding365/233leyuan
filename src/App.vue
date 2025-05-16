@@ -31,7 +31,11 @@
         }"
       >
         <div class="item-cover">
-          <img :src="item.coverImage" class="cover-image" @load="handleImageLoad(item.id)" />
+          <img
+            :src="item.coverImage"
+            class="cover-image"
+            @load="handleImageLoad(item.id)"
+          />
         </div>
         <div
           class="flex flex-col justify-start items-start box-border bg-white p-3"
@@ -176,11 +180,12 @@ const fetchData = async (isRefresh = false) => {
       ...items.value.map((item) => ({ ...item, isNew: false })),
       ...newItems,
     ];
+	console.log(items.value)
     isLoading.value = false;
   }
   // 计算初始位置
   calculateLayout();
-  
+
   // 等待图片加载完成后会自动触发recalculateLayout
 };
 
@@ -197,21 +202,21 @@ const handleImageLoad = (itemId) => {
 const calculateLayout = () => {
   if (containerWidth.value <= 0) return;
 
-  // 如果是刷新操作，重置列高度
-  if (items.value.every((item) => item.isNew)) {
+  // 如果是刷新操作或窗口大小变化，重置列高度
+  if (items.value.some((item) => item.isNew)) {
     columnHeights[0] = 0;
     columnHeights[1] = 0;
     // 清空已加载图片集合
     loadedImages.clear();
   }
 
-  // 首先设置初始位置，以便元素能够渲染到DOM中
+  // 设置所有元素的初始位置，确保在窗口大小变化时所有元素都能正确定位
   items.value.forEach((item) => {
-    if (!item.isNew) return;
-    
+    // 在窗口大小变化时，处理所有元素，而不仅仅是新元素
+
     // 找出高度较小的列
     const minHeightIndex = columnHeights[0] <= columnHeights[1] ? 0 : 1;
-    
+
     // 计算位置，考虑容器内边距
     const left =
       containerPadding.value +
@@ -219,28 +224,31 @@ const calculateLayout = () => {
     const top =
       columnHeights[minHeightIndex] +
       (columnHeights[minHeightIndex] > 0 ? gapSize.value : 0);
-    
+
     // 更新元素位置
     item.left = left;
     item.top = top;
+
+    // 更新列高度（使用估计高度，实际高度将在recalculateLayout中更新）
+    columnHeights[minHeightIndex] += 200; // 使用一个估计高度
   });
 };
 
 // 重新计算布局
 const recalculateLayout = () => {
   nextTick(() => {
-    const waterfall = document.querySelector('.waterfall-content');
+    const waterfall = document.querySelector(".waterfall-content");
     if (!waterfall) return;
-    
+
     // 重置列高度
     columnHeights[0] = 0;
     columnHeights[1] = 0;
-    
+
     // 重新计算所有元素的位置
     items.value.forEach((item, index) => {
       // 找出高度较小的列
       const minHeightIndex = columnHeights[0] <= columnHeights[1] ? 0 : 1;
-      
+
       // 计算位置，考虑容器内边距
       const left =
         containerPadding.value +
@@ -248,27 +256,35 @@ const recalculateLayout = () => {
       const top =
         columnHeights[minHeightIndex] +
         (columnHeights[minHeightIndex] > 0 ? gapSize.value : 0);
-      
+
       // 更新元素位置
       item.left = left;
       item.top = top;
-      
+
       // 查找当前项目的DOM元素
       const itemElement = waterfall.querySelector(`[data-id="${item.id}"]`);
       if (itemElement) {
         // 获取元素的实际高度
         const actualHeight = itemElement.offsetHeight;
-        
+
         // 更新列高度
         columnHeights[minHeightIndex] = top + actualHeight + gapSize.value;
+      } else {
+        // 如果元素还没有渲染，使用估计高度
+        columnHeights[minHeightIndex] += 200 + gapSize.value;
       }
-      
+
       // 移除新元素标记
       item.isNew = false;
     });
-    
-    // 更新内容区域高度
+
+    // 确保在所有元素处理完后更新内容区域高度
     updateContentHeight();
+
+    // 如果有元素没有正确定位，再次尝试更新
+    setTimeout(() => {
+      updateContentHeight();
+    }, 100);
   });
 };
 
@@ -279,7 +295,19 @@ const updateContentHeight = () => {
     Math.max(columnHeights[0], columnHeights[1]) + containerPadding.value;
   if (content.value) {
     content.value.style.height = `${contentHeight}px`;
+
+    // 确保瀑布流容器有足够的高度
+    if (container.value) {
+      container.value.style.minHeight = `${contentHeight}px`;
+    }
   }
+
+  // 确保所有元素都有正确的宽度
+  items.value.forEach((item) => {
+    if (item.width !== itemWidth.value) {
+      item.width = itemWidth.value;
+    }
+  });
 };
 
 // 处理滚动事件 - 上拉加载更多
@@ -350,7 +378,12 @@ const handleResize = throttle(() => {
       items.value.forEach((item) => {
         item.isNew = true;
       });
+      // 先计算初始布局
       calculateLayout();
+      // 然后重新计算实际布局（考虑图片加载后的实际高度）
+      nextTick(() => {
+        recalculateLayout();
+      });
     }
   }
 }, 200);
@@ -437,9 +470,10 @@ onUnmounted(() => {
   border-radius: 8px;
   overflow: hidden;
   transition: transform 0.3s ease, left 0.3s ease, top 0.3s ease,
-    width 0.3s ease;
+    width 0.3s ease, height 0.3s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   background-color: white;
+  will-change: transform, left, top, width;
 }
 
 .item-cover {

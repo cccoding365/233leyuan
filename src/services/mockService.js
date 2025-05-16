@@ -17,7 +17,7 @@ import coverImg12 from '../assets/images/covers/cover12.jpg';
 import coverImg14 from '../assets/images/covers/cover14.jpg';
 import coverImg15 from '../assets/images/covers/cover15.jpg';
 import coverImg16 from '../assets/images/covers/cover16.jpg';
-import coverImg17 from '../assets/images/covers/cover17.jpg';
+// import coverImg17 from '../assets/images/covers/cover17.jpg';
 import coverImg18 from '../assets/images/covers/cover18.jpg';
 import coverImg19 from '../assets/images/covers/cover19.jpg';
 // import coverImg20 from '../assets/images/covers/cover20.jpg';
@@ -88,7 +88,7 @@ const coverImages = [
   coverImg14,
   coverImg15,
   coverImg16,
-  coverImg17,
+//   coverImg17,
   coverImg18,
   coverImg19,
 //   coverImg20,
