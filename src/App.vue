@@ -76,8 +76,8 @@ const contentOffset = computed(() => {
 
 // 固定配置
 const COLUMN_COUNT = 2; // 固定两列
-const BASE_GAP = 10; // 基础间距
-const BASE_CONTAINER_PADDING = 10; // 基础容器内边距
+const BASE_GAP = 8; // 基础间距
+const BASE_CONTAINER_PADDING = 8; // 基础容器内边距
 
 // 根据容器宽度计算实际间距 - 保持比例
 const gapSize = computed(() => {
